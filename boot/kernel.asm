@@ -1,10 +1,12 @@
 [bits 16]
-[ORG 0x8000]
-jmp start_kernel
-%include "print.inc"
-%include "gdt.inc"
-%include "a20line.asm"
+section .text
+global start_kernel
 start_kernel:
+  jmp _kernel
+%include "boot/print.inc"
+%include "boot/gdt.inc"
+%include "boot/a20line.asm"
+_kernel:
   mov sp, 0x8bff
   mov ax, 0xb800
   mov es, ax
@@ -46,6 +48,7 @@ enabling_a20_msg db "ENABLING A20 LINE", 13, 10, 0
 kernel_loaded_msg db "KERNEL LOADED!", 13, 10, 0
 
 [bits 32]
+extern kernel_main
 protected_mode:
   mov ax, 0x10
   mov ds, ax
@@ -53,7 +56,7 @@ protected_mode:
   mov fs, ax
   mov gs, ax
   mov ss, ax
-  mov esp, 0x100000
+  mov esp, 0x200000
 
 
   mov edi, 0xb8000
@@ -87,6 +90,8 @@ protected_mode:
   mov al, 'D'
   mov [edi], ax
   add edi, 2
+
+  call kernel_main
   
 forever_young:
   jmp forever_young

@@ -5,7 +5,7 @@
 [ORG 0x7c00]      ; add to offsets
    jmp start
 
-   %include "print.inc"
+   %include "boot/print.inc"
 
 start:   
   xor ax, ax   ; make it zero
